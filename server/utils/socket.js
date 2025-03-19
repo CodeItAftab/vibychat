@@ -22,7 +22,11 @@ const users = new Map();
 const initSocket = (server) => {
   io = new Server(server, {
     cors: {
-      origin: "https://vibychat.onrender.com",
+      origin: [
+        "https://vibychat.vercel.app",
+        "https://vibychat-git-main-getsetflytomegmailcoms-projects.vercel.app",
+        "https://vibychat-neeuv79t6-getsetflytomegmailcoms-projects.vercel.app",
+      ],
       // origin: "*",
       withCredentials: true,
     },
