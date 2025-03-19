@@ -18,12 +18,16 @@ const server = http.createServer(app);
 
 app.use(
   cors({
-    // origin: "https://viby-chat.vercel.app",
     origin: [
-      "http://localhost:4173",
-      "http://localhost:5173",
-      "https://16kbbt38-5173.inc1.devtunnels.ms",
+      "https://vibychat.vercel.app",
+      "https://vibychat-git-main-getsetflytomegmailcoms-projects.vercel.app",
+      "https://vibychat-neeuv79t6-getsetflytomegmailcoms-projects.vercel.app",
     ],
+    // origin: [
+    //   "http://localhost:4173",
+    //   "http://localhost:5173",
+    //   "https://16kbbt38-5173.inc1.devtunnels.ms",
+    // ],
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
   })

@@ -1,7 +1,7 @@
 import axios from "axios";
 
-// const baseURL = "https://viby-chat.onrender.com";
-const baseURL = "http://localhost:3000";
+const baseURL = "https://vibychat.onrender.com";
+// const baseURL = "http://localhost:3000";
 // const baseURL = "https://16kbbt38-3000.inc1.devtunnels.ms";
 
 export const Axios = axios.create({

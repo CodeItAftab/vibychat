@@ -6,3 +6,4 @@ server/.env
 package-lock.json
 firebaseSDk.json
 /firebase
+firebase.js
