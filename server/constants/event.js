@@ -20,6 +20,8 @@ const READ_MESSAGE = "READ_MESSAGE";
 const FRIEND_READ_MESSAGE = "FRIEND_READ_MESSAGE";
 const START_CHAT = "START_CHAT";
 const OPEN_CHAT = "OPEN_CHAT";
+const TYPING = "TYPING";
+const STOP_TYPING = "STOP_TYPING";
 
 module.exports = {
   ALERT,
@@ -44,4 +46,6 @@ module.exports = {
   FRIEND_READ_MESSAGE,
   START_CHAT,
   OPEN_CHAT,
+  TYPING,
+  STOP_TYPING,
 };

@@ -181,6 +181,7 @@ const getAllChats = TryCatch(async (req, res, next) => {
           name: friend?.isGroup ? friend.groupName : otherMember.name,
           friendId: otherMember._id,
           isOnline: !friend.isGroup && users.has(otherMember._id.toString()),
+          isGroup: friend.isGroup,
           avatar: friend?.isGroup
             ? friend?.avatar?.url
             : otherMember?.avatar?.url,
@@ -190,6 +191,7 @@ const getAllChats = TryCatch(async (req, res, next) => {
             sender: friend.isGroup && message?.sender,
             state: message?.state,
             isSender: message?.sender.toString() === req.user._id.toString(),
+            senderName: friend.isGroup ? message?.sender.name : undefined,
             type:
               message?.type === "media"
                 ? message?.attachments[0].type

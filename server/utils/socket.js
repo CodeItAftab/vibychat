@@ -5,6 +5,8 @@ const {
   MESSAGE_DELIVERED,
   READ_MESSAGE,
   FRIEND_READ_MESSAGE,
+  TYPING,
+  STOP_TYPING,
 } = require("../constants/event");
 const Request = require("../models/request");
 const Chat = require("../models/chat");
@@ -37,7 +39,7 @@ const initSocket = (server) => {
     const chats = await Chat.find({ members: userId, isGroup: false });
 
     NotifyFriendOnlineStatus(socket, chats, userId, users, "online");
-    // MarkMessagesAsDelivered(chats, userId, users, io);
+    MarkMessagesAsDelivered(chats, userId, users, io);
 
     socket.on("disconnect", () => {
       console.log(socket.id, " disconnected");
@@ -49,6 +51,30 @@ const initSocket = (server) => {
       const chatId = data.chatId;
       await ReadMessages(chatId, userId, users, io);
       console.log("readMessages of ", chatId);
+    });
+
+    socket.on(TYPING, (data) => {
+      const chatId = data.chatId;
+      const chat = chats.find((chat) => chat._id.toString() === chatId);
+
+      for (const member of chat.members) {
+        if (member.toString() !== userId) {
+          io.to(users.get(member.toString())).emit(TYPING, { chatId, userId });
+        }
+      }
+    });
+
+    socket.on(STOP_TYPING, (data) => {
+      const chatId = data.chatId;
+      const chat = chats.find((chat) => chat._id.toString() === chatId);
+      for (const member of chat.members) {
+        if (member.toString() !== userId) {
+          io.to(users.get(member.toString())).emit(STOP_TYPING, {
+            chatId,
+            userId,
+          });
+        }
+      }
     });
   });
 };

@@ -56,19 +56,59 @@ const NotifyFriendOnlineStatus = function (
 };
 
 const MarkMessagesAsDelivered = async function (chats, userId, users, io) {
+  // for (let chat of chats) {
+  //   const lastMessage = await Message.findOne(
+  //     { chatId: chat._id, sender: { $ne: userId }, state: "sent" },
+  //     {},
+  //     { sort: { createdAt: -1 } }
+  //   );
+
+  //   if (!lastMessage) continue;
+  //   if (lastMessage.sender.toString() === userId.toString()) continue;
+  //   if (lastMessage.deliveredList.includes(userId)) continue;
+  //   if (Message.status !== "sent") continue;
+
+  // }
+
+  const senders = new Set();
+  const chatIds = new Set();
+  const senderChatIds = new Set();
   for (let chat of chats) {
-    const lastMessage = await Message.findOne(
-      { chatId: chat._id, sender: { $ne: userId }, state: "sent" },
-      {},
-      { sort: { createdAt: -1 } }
-    );
+    const messages = await Message.find({
+      chatId: chat._id,
+      state: "sent",
+      sender: { $ne: userId },
+    });
 
-    if (!lastMessage) continue;
-    if (lastMessage.sender.toString() === userId.toString()) continue;
-    if (lastMessage.deliveredList.includes(userId)) continue;
-    if (Message.status !== "sent") continue;
+    if (messages.length === 0) continue;
 
-    // notify sender that message is delivered
+    for (let message of messages) {
+      if (message.state === "delivered" || message.state === "read") continue;
+      if (message.sender.toString() === userId.toString()) continue;
+      if (message.deliveredList.includes(userId)) continue;
+
+      message.deliveredList.push(userId);
+      if (message.deliveredList.length === chat.members.length - 1) {
+        message.state = "delivered";
+        senders.add(message.sender.toString());
+        chatIds.add(chat._id.toString());
+        senderChatIds.add(
+          message.sender.toString() + "=%=%" + chat._id.toString()
+        );
+      }
+
+      await message.save();
+    }
+  }
+
+  for (let senderChatId of senderChatIds) {
+    const [sender, chatId] = senderChatId.split("=%=%");
+    const senderSocketId = users?.get(sender);
+    if (senderSocketId) {
+      io.to(senderSocketId).emit(MESSAGE_DELIVERED, {
+        chatId: chatId,
+      });
+    }
   }
 };
 
@@ -119,17 +159,6 @@ const ReadMessages = async function (chatId, userId, users, io) {
       }
     }
   }
-
-  // for (let sender of senders) {
-  //   const senderSocketId = users?.get(sender);
-  //   if (senderSocketId) {
-  //     io.to(senderSocketId).emit(FRIEND_READ_MESSAGE, {
-  //       chatId: chat._id,
-  //       friendId: userId,
-  //       messageIds: messages.map((message) => message._id),
-  //     });
-  //   }
-  // }
 };
 
 module.exports = {
